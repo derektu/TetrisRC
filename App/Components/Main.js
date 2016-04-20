@@ -17,6 +17,10 @@ class Main extends Component {
   _pressQuit() {
     alert('Quit');
   }
+
+  _pressStart() {
+    alert('Start');
+  }
   
   // 標題列
   //
@@ -44,12 +48,25 @@ class Main extends Component {
       </View>
     );    
   }
+  
+  _renderGameToolbar() {
+    // TODO: 一開始是Start, 按了之後變成 Pause 跟 Stop
+    //
+    return (
+      <View style={styles.gametoolbarContainer}>
+        <TouchableHighlight underlayColor='transparent' onPress={this._pressStart.bind(this)}>
+          <Text style={styles.startButton}>START</Text>
+        </TouchableHighlight>       
+      </View>
+    );    
+  }
    
   render() {
     return (
       <View style={styles.container}>
         { this._renderHeading() }
         { this._renderToolbar() }
+        { this._renderGameToolbar() }
         <View style={styles.bodyContainer}>
           <Text style={styles.welcome}>
             Welcome to React Native!
@@ -94,6 +111,33 @@ const styles = StyleSheet.create({
   },  
   
   toolbarButton: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#295EFF',
+    margin: 8,
+  },
+  
+  //---------- Game Toolbar -------
+  //
+  gametoolbarContainer: {
+    flexDirection: 'row',
+    padding: 4,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderBottomWidth: 2,
+    borderBottomColor: '#808080'
+  },  
+  
+  startButton: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#FF205C',
+    marginHorizontal: 20,
+    marginVertical: 10,
+  },
+
+  stopButton: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#295EFF',
