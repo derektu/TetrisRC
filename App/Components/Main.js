@@ -6,6 +6,28 @@ import React, {
   TouchableHighlight,
 } from 'react-native';
 
+// Control Button
+//  <ControlButton text='..' onPress={..}></ControlButton>
+class ControlButton extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  _handlePress() {
+    this.props.onPress();  
+  }
+  
+  render() {
+    return (
+      <TouchableHighlight underlayColor='transparent' onPress={this._handlePress.bind(this)}>
+        <View style={styles.control}>
+          <Text style={styles.controlButton}>{this.props.text}</Text>
+        </View>  
+      </TouchableHighlight>  
+    )  
+  }
+}
+
 // 主畫面
 //
 class Main extends Component {
@@ -71,40 +93,15 @@ class Main extends Component {
     return (
       <View style={styles.padContainer}>
         <View style={styles.padRow}>
-          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'L')}>
-            <View style={styles.control}>
-              <Text style={styles.controlButton}>L</Text>
-            </View>  
-          </TouchableHighlight>  
-          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'D')}>
-            <View style={styles.control}>
-              <Text style={styles.controlButton}>D</Text>
-            </View>  
-          </TouchableHighlight>  
-          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'R')}>
-            <View style={styles.control}>
-              <Text style={styles.controlButton}>R</Text>
-            </View>              
-          </TouchableHighlight>  
+          <ControlButton text='L' onPress={this._pressButton.bind(this, 'L')}/>
+          <ControlButton text='D' onPress={this._pressButton.bind(this, 'D')}/>
+          <ControlButton text='R' onPress={this._pressButton.bind(this, 'R')}/>
         </View>
         <View style={styles.padRow}>
-          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'LL')}>
-            <View style={styles.control}>
-              <Text style={styles.controlButton}>LL</Text>
-            </View>  
-          </TouchableHighlight>  
-          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'DD')}>
-            <View style={styles.control}>
-              <Text style={styles.controlButton}>DD</Text>
-            </View>  
-          </TouchableHighlight>  
-          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'RR')}>
-            <View style={styles.control}>
-              <Text style={styles.controlButton}>RR</Text>
-            </View>  
-          </TouchableHighlight>  
+          <ControlButton text='LL' onPress={this._pressButton.bind(this, 'LL')}/>
+          <ControlButton text='DD' onPress={this._pressButton.bind(this, 'DD')}/>
+          <ControlButton text='RR' onPress={this._pressButton.bind(this, 'RR')}/>
         </View>
-      
       </View>  
     );    
   }
