@@ -22,6 +22,10 @@ class Main extends Component {
     alert('Start');
   }
   
+  _pressButton(direction) {
+    alert(direction);
+  }
+  
   // 標題列
   //
   _renderHeading() {
@@ -60,6 +64,50 @@ class Main extends Component {
       </View>
     );    
   }
+  
+  // Game的方向按鈕
+  //
+  _renderControlPad() {
+    return (
+      <View style={styles.padContainer}>
+        <View style={styles.padRow}>
+          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'L')}>
+            <View style={styles.control}>
+              <Text style={styles.controlButton}>L</Text>
+            </View>  
+          </TouchableHighlight>  
+          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'D')}>
+            <View style={styles.control}>
+              <Text style={styles.controlButton}>D</Text>
+            </View>  
+          </TouchableHighlight>  
+          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'R')}>
+            <View style={styles.control}>
+              <Text style={styles.controlButton}>R</Text>
+            </View>              
+          </TouchableHighlight>  
+        </View>
+        <View style={styles.padRow}>
+          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'LL')}>
+            <View style={styles.control}>
+              <Text style={styles.controlButton}>LL</Text>
+            </View>  
+          </TouchableHighlight>  
+          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'DD')}>
+            <View style={styles.control}>
+              <Text style={styles.controlButton}>DD</Text>
+            </View>  
+          </TouchableHighlight>  
+          <TouchableHighlight underlayColor='transparent' onPress={this._pressButton.bind(this, 'RR')}>
+            <View style={styles.control}>
+              <Text style={styles.controlButton}>RR</Text>
+            </View>  
+          </TouchableHighlight>  
+        </View>
+      
+      </View>  
+    );    
+  }
    
   render() {
     return (
@@ -67,11 +115,7 @@ class Main extends Component {
         { this._renderHeading() }
         { this._renderToolbar() }
         { this._renderGameToolbar() }
-        <View style={styles.bodyContainer}>
-          <Text style={styles.welcome}>
-            Welcome to React Native!
-          </Text>
-        </View>  
+        { this._renderControlPad() }
       </View>
     );
   }
@@ -144,19 +188,44 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   
-  //---------- Body --------- 
+  //---------- Pad --------- 
   //
-  bodyContainer: {
+  padContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  
+  padRow: {
+    flexDirection: 'row',
+    padding: 4,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    marginVertical: 10,
   },
+
+  control: {
+    borderWidth: 2,
+    borderColor: '#606060',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 90,
+    height: 90,
+    marginHorizontal: 20,
+    marginVertical: 20,
+    backgroundColor: '#FFAE94',
+  },
+
+  controlButton: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#1010FF',
+  },
+  
 });
 
 module.exports = Main;
