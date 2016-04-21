@@ -8,6 +8,8 @@ import React, {
   BackAndroid,
 } from 'react-native';
 
+var BTSerial = require('react-native-android-btserial');
+
 // Control Button
 //  <ControlButton text='..' onPress={..}></ControlButton>
 class ControlButton extends Component {
@@ -39,6 +41,17 @@ class Main extends Component {
   
   componentWillMount() {
     BackAndroid.addEventListener('hardwareBackPress', this._handleBackButton.bind(this));
+    BTSerial.isEnabled((err, enabled)=> {
+      if (err || !enabled) {
+        Alert.alert(
+          'TetrisRC',
+          '請啟動藍芽裝置。',
+          [
+            {text: 'OK', onPress: () => { BTSerial.showBTSettings(); }}
+          ]
+        );
+      }
+    })
   }
   
   _handleBackButton() {
