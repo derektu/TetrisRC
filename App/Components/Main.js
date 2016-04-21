@@ -4,6 +4,8 @@ import React, {
   Text,
   View,
   TouchableHighlight,
+  Alert,
+  BackAndroid,
 } from 'react-native';
 
 // Control Button
@@ -31,13 +33,38 @@ class ControlButton extends Component {
 // 主畫面
 //
 class Main extends Component {
+  constructor(props) {
+    super(props);
+  }
+  
+  componentWillMount() {
+    BackAndroid.addEventListener('hardwareBackPress', this._handleBackButton.bind(this));
+  }
+  
+  _handleBackButton() {
+    this._handleExit();
+    return true;
+  }
+  
+  _handleExit() {
+    // 詢問是否要離開程式
+    //
+    Alert.alert(
+      'TetrisRC',
+      '確定要離開程式嗎？',
+      [
+        {text: 'Cancel', onPress: () => {}, style: 'cancel'},
+        {text: 'OK', onPress: () => { BackAndroid.exitApp(); }}
+      ]
+    )
+  }
   
   _pressConnect() {
     alert('Connect');
   }
 
   _pressQuit() {
-    alert('Quit');
+    this._handleExit();
   }
 
   _pressStart() {
