@@ -32,15 +32,31 @@ class ControlButton extends Component {
   }
 }
 
+var CONNECT_STATUS = {
+  NONE : 0,
+  CONNECTING : 1,
+  CONNECTED : 2
+};
+
 // 主畫面
 //
 class Main extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      connectStatus: CONNECT_STATUS.NONE
+    };
+    
+    this.deviceName = '98:D3:31:90:6C:78';
   }
   
   componentWillMount() {
     BackAndroid.addEventListener('hardwareBackPress', this._handleBackButton.bind(this));
+    BTSerial.setConnectionStatusCallback((e)=> {
+      alert('連線中斷');
+      this.setState({connectStatus: CONNECT_STATUS.NONE});
+    })
+    
     BTSerial.isEnabled((err, enabled)=> {
       if (err || !enabled) {
         Alert.alert(
@@ -52,6 +68,17 @@ class Main extends Component {
         );
       }
     })
+  }
+  
+  _isConnected() {
+    return this.state.connectStatus == CONNECT_STATUS.CONNECTED;
+  }
+  
+  _exitApp() {
+    if (this._isConnected()) {
+      BTSerial.disconnect();
+    }
+    BackAndroid.exitApp();
   }
   
   _handleBackButton() {
@@ -67,13 +94,37 @@ class Main extends Component {
       '確定要離開程式嗎？',
       [
         {text: 'Cancel', onPress: () => {}, style: 'cancel'},
-        {text: 'OK', onPress: () => { BackAndroid.exitApp(); }}
+        {text: 'OK', onPress: () => { this._exitApp(); }}
       ]
     )
   }
   
   _pressConnect() {
-    alert('Connect');
+    if (this.state.connectStatus != CONNECT_STATUS.CONNECTED) {
+      // 尚未連線 => 開始連線
+      this.setState({connectStatus: CONNECT_STATUS.CONNECTING});
+      BTSerial.connect(this.deviceName, (err, status, name) => {
+        if (err) {
+          alert('連線時發生錯誤:' + err);
+          this.setState({connectStatus: CONNECT_STATUS.NONE});
+        }
+        else if (!status) {
+          alert('無法連線');
+          this.setState({connectStatus: CONNECT_STATUS.NONE});
+        }
+        else {
+          alert('連線成功');
+          this.setState({connectStatus: CONNECT_STATUS.CONNECTED});
+          // TODO: 連線成功之後要送指令reset tetris的遊戲狀態
+        }
+      });
+    }
+    else {
+      // 可能連線中, 或是已經連線 => 中斷連線
+      //
+      this.setState({connectStatus: CONNECT_STATUS.NONE});
+      BTSerial.disconnect();
+    }
   }
 
   _pressQuit() {
@@ -103,12 +154,23 @@ class Main extends Component {
   //  - 關閉程式button
   //
   _renderToolbar() {
+    let connectBtnText = '';
+    if (this.state.connectStatus == CONNECT_STATUS.NONE) {
+      connectBtnText = '開始連線';
+    }
+    else if (this.state.connectStatus == CONNECT_STATUS.CONNECTING) {
+      connectBtnText = '連線中..';
+    }
+    else {
+      connectBtnText = '連線成功';
+    }
+    
     return (
       <View style={styles.toolbarContainer}>
-        <TouchableHighlight underlayColor='transparent' onPress={this._pressConnect.bind(this)}>
-          <Text style={styles.toolbarButton}>開始連線</Text>
+        <TouchableHighlight underlayColor='#d0d0d0' onPress={this._pressConnect.bind(this)}>
+          <Text style={styles.toolbarButton}>{connectBtnText}</Text>
         </TouchableHighlight>       
-        <TouchableHighlight underlayColor='transparent' onPress={this._pressQuit.bind(this)}>
+        <TouchableHighlight underlayColor='#d0d0d0' onPress={this._pressQuit.bind(this)}>
           <Text style={styles.toolbarButton}>離開程式</Text>     
         </TouchableHighlight>       
       </View>
@@ -116,34 +178,46 @@ class Main extends Component {
   }
   
   _renderGameToolbar() {
-    // TODO: 一開始是Start, 按了之後變成 Pause 跟 Stop
-    //
-    return (
-      <View style={styles.gametoolbarContainer}>
-        <TouchableHighlight underlayColor='transparent' onPress={this._pressStart.bind(this)}>
-          <Text style={styles.startButton}>START</Text>
-        </TouchableHighlight>       
-      </View>
-    );    
+    if (this._isConnected()) {
+      return (
+        <View style={styles.gametoolbarContainer}>
+          <TouchableHighlight underlayColor='transparent' onPress={this._pressStart.bind(this)}>
+            <Text style={styles.startButton}>START</Text>
+          </TouchableHighlight>       
+        </View>
+      );    
+    }
+    else {
+      return (
+        <View/>
+      )  
+    }
   }
   
   // Game的方向按鈕
   //
   _renderControlPad() {
-    return (
-      <View style={styles.padContainer}>
-        <View style={styles.padRow}>
-          <ControlButton text='L' onPress={this._pressButton.bind(this, 'L')}/>
-          <ControlButton text='D' onPress={this._pressButton.bind(this, 'D')}/>
-          <ControlButton text='R' onPress={this._pressButton.bind(this, 'R')}/>
-        </View>
-        <View style={styles.padRow}>
-          <ControlButton text='LL' onPress={this._pressButton.bind(this, 'LL')}/>
-          <ControlButton text='DD' onPress={this._pressButton.bind(this, 'DD')}/>
-          <ControlButton text='RR' onPress={this._pressButton.bind(this, 'RR')}/>
-        </View>
-      </View>  
-    );    
+    if (this._isConnected()) {
+      return (
+        <View style={styles.padContainer}>
+          <View style={styles.padRow}>
+            <ControlButton text='L' onPress={this._pressButton.bind(this, 'L')}/>
+            <ControlButton text='D' onPress={this._pressButton.bind(this, 'D')}/>
+            <ControlButton text='R' onPress={this._pressButton.bind(this, 'R')}/>
+          </View>
+          <View style={styles.padRow}>
+            <ControlButton text='LL' onPress={this._pressButton.bind(this, 'LL')}/>
+            <ControlButton text='DD' onPress={this._pressButton.bind(this, 'DD')}/>
+            <ControlButton text='RR' onPress={this._pressButton.bind(this, 'RR')}/>
+          </View>
+        </View>  
+      );    
+    }
+    else {
+      return (
+        <View/>
+      )  
+    }
   }
    
   render() {
